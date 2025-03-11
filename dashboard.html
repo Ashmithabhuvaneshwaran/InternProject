@@ -1,0 +1,267 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        /* Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* General Styling */
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f5f5, #ffffff);
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background: #ffffff;
+            padding: 1em;
+            box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        nav .logo {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #0078d7;
+            animation: bounce 2s infinite alternate;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 1.5em;
+            float: right;
+        }
+
+        nav ul li a {
+            color: #555;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
+
+        nav ul li a:hover {
+            color: #0078d7;
+            transform: translateY(-3px);
+        }
+
+        main {
+            flex: 1;
+            padding: 2em;
+        }
+
+        h2 {
+            font-size: 2em;
+            text-align: center;
+            margin-bottom: 1em;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        /* Search Form Styling */
+        .search-form {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2em;
+        }
+
+        .search-form input[type="text"] {
+            padding: 0.7em;
+            font-size: 1em;
+            border: 1px solid #ccc;
+            border-radius: 5px 0 0 5px;
+            width: 300px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-form input[type="text"]:focus {
+            border-color: #0078d7;
+            box-shadow: 0px 4px 10px rgba(0, 120, 215, 0.3);
+        }
+
+        .search-form button {
+            padding: 0.7em;
+            font-size: 1em;
+            border: none;
+            background: #0078d7;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 0 5px 5px 0;
+            transition: all 0.3s ease;
+        }
+
+        .search-form button:hover {
+            background: #005bb5;
+            transform: scale(1.05);
+        }
+
+        /* Product Table Styling */
+        .product-table {
+            max-width: 800px;
+            margin: 0 auto;
+            border-collapse: collapse;
+            width: 100%;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            animation: slideUp 1s ease-in-out;
+        }
+
+        .product-table th, .product-table td {
+            padding: 1em;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            background: rgba(240, 240, 240, 0.8);
+            transition: background 0.3s ease-in-out;
+        }
+
+        .product-table th {
+            background: #0078d7;
+            color: #fff;
+        }
+
+        .product-table tr:hover {
+            background: #f1f1f1;
+        }
+
+        .product-table td {
+            text-align: center;
+        }
+
+        .popup {
+            display: none;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #0078d7;
+            color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            z-index: 1000;
+            animation: fadeIn 0.8s ease-in-out;
+        }
+
+        .popup.success {
+            background-color: green;
+        }
+
+        .popup.error {
+            background-color: red;
+        }
+
+        /* Footer Styling */
+        footer {
+            text-align: center;
+            padding: 1em;
+            background: #ffffff;
+            color: #555;
+            box-shadow: 0px -3px 10px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 2s ease-in-out;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-5px); }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">User Dashboard</div>
+            <ul>
+                <li><a href="{{ url_for('home') }}">Home</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="dashboard-content">
+            <h2>Welcome, {{ username }}!</h2>
+            <p>Explore our available products below.</p>
+
+            <!-- Search Form -->
+            <form action="{{ url_for('dashboard') }}" method="POST" class="search-form">
+                <input type="text" name="search" placeholder="Search products..." value="{{ search_query }}" required>
+                <button type="submit">Search</button>
+            </form>
+
+            <!-- Product Table -->
+            <table class="product-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if products %}
+                        {% for product in products %}
+                        <tr>
+                            <td>{{ product[1] }}</td>
+                            <td>{{ product[2] }}</td>
+                            <td>${{ product[3] }}</td>
+                            <td>{{ product[4] }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="4">No products found.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+
+            {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+            <div id="popup" class="popup {% for category, message in messages %}{{ category }}{% endfor %}">
+                {% for category, message in messages %}
+                {{ message }}
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; Ashmitha B (2303737724422039)</p>
+    </footer>
+
+    <script>
+        // Display flash message as popup
+        window.onload = function() {
+            const popup = document.getElementById('popup');
+            if (popup) {
+                popup.style.display = 'block';
+                setTimeout(() => { popup.style.display = 'none'; }, 3000);
+            }
+        };
+    </script>
+</body>
+</html>
