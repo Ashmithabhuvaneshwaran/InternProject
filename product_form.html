@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if product %}Edit Product{% else %}Add New Product{% endif %}</title>
+    <style>
+        /* Basic Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f5f5, #e6e6e6);
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Header and Navigation */
+        header {
+            background-color: #ffffff;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+
+        header .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #007BFF;
+            animation: logoGlow 6s infinite alternate ease-in-out;
+        }
+
+        header ul {
+            list-style: none;
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        header ul li a {
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s, transform 0.3s;
+        }
+
+        header ul li a:hover {
+            color: #007BFF;
+            transform: scale(1.1);
+        }
+
+        /* Form Section with 3D Effects */
+        .form-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            max-width: 600px;
+            margin: 2rem auto;
+            background-color: #f0f0f0; /* Changed background color of form */
+            border-radius: 10px;
+            box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .form-section:hover {
+            transform: translateY(-10px);
+            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .form-section h2 {
+            font-size: 2rem;
+            color: #007BFF; /* Title color */
+            margin-bottom: 1.5rem;
+            text-align: center;
+            animation: fadeInSlide 1.5s ease-out forwards;
+        }
+
+        .form-section table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .form-section th, .form-section td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .form-section th {
+            background-color: #007BFF; /* Background color for table headers */
+            color: white;
+        }
+
+        .form-section td input,
+        .form-section td textarea {
+            width: 100%;
+            padding: 0.75rem;
+            font-size: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #ffffff; /* Background color for form inputs */
+            color: #333; /* Text color inside inputs */
+            transition: box-shadow 0.3s, border 0.3s;
+        }
+
+        .form-section td input:focus,
+        .form-section td textarea:focus {
+            border: 1px solid #007BFF;
+            box-shadow: 0px 0px 10px rgba(0, 123, 255, 0.3);
+            outline: none;
+        }
+
+        .cta-button {
+            padding: 0.75rem;
+            font-size: 1rem;
+            border: none;
+            border-radius: 5px;
+            background-color: #007BFF;
+            color: #fff;
+            cursor: pointer;
+            box-shadow: 0px 4px 10px rgba(0, 123, 255, 0.4);
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .cta-button:hover {
+            background-color: #0056b3;
+            transform: translateY(-3px) scale(1.05);
+        }
+
+        /* Footer with Smooth Slide Effect */
+        footer {
+            background-color: #ffffff;
+            text-align: center;
+            padding: 1rem;
+            color: #666;
+            font-size: 0.875rem;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+            box-shadow: 0px -2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Popup Styling */
+        .popup {
+            display: none;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #333;
+            color: #fff;
+            padding: 15px;
+            border-radius: 5px;
+            z-index: 1000;
+            opacity: 0.9;
+        }
+
+        .popup.success { background-color: #28a745; }
+        .popup.error { background-color: #dc3545; }
+
+        /* Animations */
+        @keyframes fadeInSlide {
+            0% { opacity: 0; transform: translateY(-20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes logoGlow {
+            0% { text-shadow: 0 0 5px #007BFF, 0 0 10px #007BFF; }
+            100% { text-shadow: 0 0 20px #0056b3, 0 0 40px #0056b3; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">Admin Panel</div>
+            <ul>
+                <li><a href="{{ url_for('admin') }}">Admin Home</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        {% with messages = get_flashed_messages(with_categories=True) %}
+        {% if messages %}
+        <div id="popup" class="popup {% for category, message in messages %}{{ category }}{% endfor %}">
+            {% for category, message in messages %}
+            {{ message }}
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <script>
+            window.onload = function() {
+                const popup = document.getElementById('popup');
+                if (popup) {
+                    popup.style.display = 'block';
+                    setTimeout(() => { popup.style.display = 'none'; }, 3000);
+                }
+            };
+        </script>
+
+        <section class="form-section">
+            <h2>{% if product %}Edit Product{% else %}Add New Product{% endif %}</h2>
+            <form method="POST">
+                <table>
+                    <tr>
+                        <th>Product Name</th>
+                        <td><input type="text" name="name" placeholder="Product Name" value="{{ product[1] if product else '' }}" required></td>
+                    </tr>
+                    <tr>
+                        <th>Product Description</th>
+                        <td><textarea name="description" placeholder="Product Description" required>{{ product[2] if product else '' }}</textarea></td>
+                    </tr>
+                    <tr>
+                        <th>Price</th>
+                        <td><input type="number" name="price" placeholder="Price" value="{{ product[3] if product else '' }}" required></td>
+                    </tr>
+                    <tr>
+                        <th>Stock</th>
+                        <td><input type="number" name="stock" placeholder="Stock" value="{{ product[4] if product else '' }}" required></td>
+                    </tr>
+                </table>
+                <button type="submit" class="cta-button">{% if product %}Update Product{% else %}Add Product{% endif %}</button>
+            </form>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy;  Ashmitha B (2303737724422039). All Rights Reserved.</p>
+    </footer>
+</body>
+</html>
