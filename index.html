@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Market</title>
+    <style>
+        /* Basic Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa, #e4ebf5);
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: background 0.5s ease;
+        }
+
+        /* Header and Navigation */
+        header {
+            background-color: #ffffff;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
+            transition: background 0.3s ease;
+        }
+
+        header .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #4a90e2;
+            text-transform: uppercase;
+            animation: logoBounce 5s infinite alternate ease-in-out;
+        }
+
+        header ul {
+            list-style-type: none;
+            display: flex;
+            gap: 1.5rem;
+            margin-left: auto;
+        }
+
+        header ul li a {
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s, transform 0.3s;
+        }
+
+        header ul li a:hover {
+            color: #4a90e2;
+            transform: scale(1.1);
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 5rem 2rem;
+            color: #333;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            margin: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 2s ease-in-out;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            color: #4a90e2;
+            margin-bottom: 1rem;
+            animation: textSlideIn 1s ease-in-out;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            animation: textSlideIn 1.5s ease-in-out;
+        }
+
+        .cta-button {
+            background-color: #4a90e2;
+            color: #fff;
+            text-decoration: none;
+            padding: 1rem 2rem;
+            border-radius: 4px;
+            font-size: 1.1rem;
+            display: inline-block;
+            box-shadow: 0px 4px 10px rgba(74, 144, 226, 0.5);
+            transition: transform 0.3s, background-color 0.3s, box-shadow 0.3s;
+        }
+
+        .cta-button:hover {
+            background-color: #4175b6;
+            transform: scale(1.1);
+            box-shadow: 0px 6px 15px rgba(65, 117, 182, 0.7);
+        }
+
+        /* Footer Styles */
+        footer {
+            background-color: #ffffff;
+            text-align: center;
+            padding: 1rem;
+            color: #888;
+            font-size: 0.875rem;
+            box-shadow: 0px -4px 20px rgba(0, 0, 0, 0.1);
+            animation: footerSlideIn 1s ease-in-out;
+        }
+
+        /* Popups */
+        .popup {
+            display: none;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #f8f9fa;
+            color: #333;
+            padding: 15px;
+            border-radius: 5px;
+            z-index: 1000;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            animation: popupAppear 0.5s ease;
+        }
+
+        .popup.success { background-color: #4caf50; color: #fff; }
+        .popup.error { background-color: #f44336; color: #fff; }
+
+        /* Animations */
+        @keyframes logoBounce {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-10px); }
+        }
+
+        @keyframes textSlideIn {
+            0% { transform: translateY(50px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: scale(0.95); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes footerSlideIn {
+            0% { transform: translateY(100px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes popupAppear {
+            0% { transform: translateY(-20px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">Super Market</div>
+            <ul>
+                <li><a href="/">Home</a></li>
+                {% if 'loggedin' not in session %}
+                    <li><a href="{{ url_for('login') }}">Login</a></li>
+                    <li><a href="{{ url_for('register') }}">Register</a></li>
+                {% elif session['role'] == 'user' %}
+                    <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                    <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                {% elif session['role'] == 'admin' %}
+                    <li><a href="{{ url_for('admin') }}">Admin Panel</a></li>
+                    <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        {% with messages = get_flashed_messages(with_categories=True) %}
+        {% if messages %}
+            <div id="popup" class="popup {% for category, message in messages %}{{ category }}{% endfor %}">
+                {% for category, message in messages %}
+                    {{ message }}
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% endwith %}
+
+        <script>
+            // Display flash message as popup
+            window.onload = function () {
+                const popup = document.getElementById('popup');
+                if (popup) {
+                    popup.style.display = 'block';
+                    setTimeout(() => { popup.style.display = 'none'; }, 3000);
+                }
+            };
+        </script>
+
+        <section class="hero">
+            <h1>Welcome to Our Super Market Platform</h1>
+            <p>Discover the best products, manage your dashboard, and more.</p>
+            {% if 'loggedin' not in session %}
+                <a href="{{ url_for('register') }}" class="cta-button">Get Started</a>
+            {% endif %}
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; Ashmitha B (2303737724422039)</p>
+    </footer>
+</body>
+</html>
