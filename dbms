@@ -1,0 +1,37 @@
+CREATE DATABASE supermarket_db;
+USE supermarket_db;
+CREATE TABLE products (
+    product_id INT AUTO_INCREMENT PRIMARY KEY,
+    product_name VARCHAR(255) NOT NULL,
+    product_description TEXT,
+    category VARCHAR(100),
+    price DECIMAL(10,2) NOT NULL,
+    stock INT NOT NULL,
+    supplier_id INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+CREATE TABLE suppliers (
+    supplier_id INT AUTO_INCREMENT PRIMARY KEY,
+    supplier_name VARCHAR(255) NOT NULL,
+    contact_person VARCHAR(100),
+    phone VARCHAR(20),
+    email VARCHAR(100),
+    address TEXT
+);
+INSERT INTO products (product_name, product_description, category, price, stock, supplier_id)
+VALUES 
+('Apple', 'Fresh Red Apples', 'Fruits', 2.99, 50, 1),
+('Milk', '1L Full Cream Milk', 'Dairy', 1.99, 30, 2),
+('Rice', '5kg Basmati Rice', 'Grains', 10.99, 20, 3),
+('Shampoo', 'Herbal Shampoo 500ml', 'Personal Care', 5.49, 15, 4),
+('Toothpaste', '100g Fluoride Toothpaste', 'Personal Care', 2.50, 40, 4);
+
+INSERT INTO suppliers (supplier_name, contact_person, phone, email, address)
+VALUES 
+('Fresh Farms', 'John Doe', '1234567890', 'freshfarms@example.com', '123 Green Street, NY'),
+('Dairy Delight', 'Sarah Smith', '9876543210', 'dairydelight@example.com', '45 Milk Road, CA'),
+('Rice Traders Ltd.', 'Ali Khan', '5557779999', 'ricetraders@example.com', '678 Grain Lane, TX'),
+('Personal Care Co.', 'Emma Watson', '1122334455', 'pcc@example.com', '321 Wellness Ave, FL');
+SELECT * FROM products;
+SELECT * FROM suppliers;
